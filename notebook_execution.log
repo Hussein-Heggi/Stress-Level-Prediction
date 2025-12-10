@@ -1,0 +1,130 @@
+[NbConvertApp] Converting notebook Complete_Standalone_Pipeline.ipynb to notebook
+Traceback (most recent call last):
+  File "/home/moh/miniconda3/bin/jupyter-nbconvert", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/jupyter_core/application.py", line 283, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/moh/miniconda3/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+print("\n" + "="*80)
+print("BUILDING DATASET FROM RAW DATA")
+print("="*80)
+
+# Get all subjects
+all_subjects = []
+for protocol in ['STRESS', 'AEROBIC', 'ANAEROBIC']:
+    protocol_dir = DATASETS_DIR / protocol
+    if protocol_dir.exists():
+        for subject_dir in protocol_dir.iterdir():
+            if subject_dir.is_dir():
+                all_subjects.append((protocol, subject_dir.name))
+
+print(f"\nFound {len(all_subjects)} subject-protocol combinations")
+print("\nProcessing subjects (this will take 10-15 minutes)...\n")
+
+all_windows = []
+for protocol, subject in tqdm(all_subjects, desc="Processing"):
+    windows = process_subject(protocol, subject)
+    all_windows.extend(windows)
+
+print(f"\n✓ Extracted {len(all_windows)} windows")
+
+# Convert to DataFrame
+dataset = pd.DataFrame(all_windows)
+
+print(f"✓ Dataset shape: {dataset.shape}")
+print(f"✓ Subjects: {dataset['subject'].nunique()}")
+print(f"\nLabel distribution:")
+print(dataset['label'].value_counts())
+------------------
+
+----- stdout -----
+
+================================================================================
+BUILDING DATASET FROM RAW DATA
+================================================================================
+
+Found 100 subject-protocol combinations
+
+Processing subjects (this will take 10-15 minutes)...
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mTypeError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[10][39m[32m, line 19[39m
+[32m     17[39m all_windows = []
+[32m     18[39m [38;5;28;01mfor[39;00m protocol, subject [38;5;129;01min[39;00m tqdm(all_subjects, desc=[33m"[39m[33mProcessing[39m[33m"[39m):
+[32m---> [39m[32m19[39m     windows = [43mprocess_subject[49m[43m([49m[43mprotocol[49m[43m,[49m[43m [49m[43msubject[49m[43m)[49m
+[32m     20[39m     all_windows.extend(windows)
+[32m     22[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[38;5;130;01m\n[39;00m[33m✓ Extracted [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(all_windows)[38;5;132;01m}[39;00m[33m windows[39m[33m"[39m)
+
+[36mCell[39m[36m [39m[32mIn[9][39m[32m, line 105[39m, in [36mprocess_subject[39m[34m(protocol, subject)[39m
+[32m    103[39m features = {}
+[32m    104[39m features.update(extract_eda_features(eda_win, TARGET_FS))
+[32m--> [39m[32m105[39m features.update([43mextract_hrv_features[49m[43m([49m[43mibi_raw[49m[43m)[49m)
+[32m    106[39m features.update(extract_temp_features(temp_win))
+[32m    107[39m features.update(extract_acc_features(acc_win))
+
+[36mCell[39m[36m [39m[32mIn[5][39m[32m, line 50[39m, in [36mextract_hrv_features[39m[34m(ibi)[39m
+[32m     48[39m [38;5;28;01mdef[39;00m [34mextract_hrv_features[39m(ibi: np.ndarray) -> Dict[[38;5;28mstr[39m, [38;5;28mfloat[39m]:
+[32m     49[39m [38;5;250m    [39m[33;03m"""Extract HRV features including nonlinear."""[39;00m
+[32m---> [39m[32m50[39m     ibi_clean = [43mvalidate_ibi[49m[43m([49m[43mibi[49m[43m)[49m
+[32m     52[39m     features = {}
+[32m     53[39m     [38;5;28;01mif[39;00m ibi_clean [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mor[39;00m [38;5;28mlen[39m(ibi_clean) < [32m5[39m:
+[32m     54[39m         [38;5;66;03m# Return NaN for all features[39;00m
+
+[36mCell[39m[36m [39m[32mIn[5][39m[32m, line 5[39m, in [36mvalidate_ibi[39m[34m(ibi, min_count)[39m
+[32m      3[39m [38;5;28;01mif[39;00m ibi [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mor[39;00m [38;5;28mlen[39m(ibi) == [32m0[39m:
+[32m      4[39m     [38;5;28;01mreturn[39;00m [38;5;28;01mNone[39;00m
+[32m----> [39m[32m5[39m valid = ([43mibi[49m[43m [49m[43m>[49m[43m=[49m[43m [49m[32;43m0.3[39;49m) & (ibi <= [32m2.0[39m) & ~np.isnan(ibi)
+[32m      6[39m cleaned = ibi[valid]
+[32m      7[39m [38;5;28;01mreturn[39;00m cleaned [38;5;28;01mif[39;00m [38;5;28mlen[39m(cleaned) >= min_count [38;5;28;01melse[39;00m [38;5;28;01mNone[39;00m
+
+[31mTypeError[39m: '>=' not supported between instances of 'str' and 'float'
+
